@@ -3,30 +3,36 @@
  */
 package net.courtanet.tripservice;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 
 public class TripService {
 
-    // Method to be tested
-    public List<Trip> getTripsByUser(User user) throws UserNotLoggedInException {
-        List<Trip> tripList = new ArrayList<>();
-        User loggedUser = new UserSession().getInstance().getLoggedUser();
-        boolean isFriend = false;
-        if (loggedUser != null) {
-            for (User friend : user.getFriends()) {
-                if (friend.equals(loggedUser)) {
-                    isFriend = true;
-                    break;
-                }
+    /**
+     * Check if user has friends
+     */
+    public static Boolean hasFriend(User user) {
+        List<User> friends = user.getFriends()
+        for (User f : friends) {
+            if (f.equals(loggedUser)) {
+                return true;
             }
-            if (isFriend) {
-                tripList = TripDAO.findTripsByUser(user);
-            }
-            return tripList;
-        } else {
-            throw new UserNotLoggedInException();
         }
+        return false;
     }
 
+    /**
+     * Return list of trips for a logged User with Friends
+     */
+    public List<Trip> getTripsByUser(User user) throws UserNotLoggedInException {
+        User loggedUser = new UserSession().getInstance().getLoggedUser();
+        if (loggedUser == null) {
+            throw new UserNotLoggedInException();
+        }
+        if TripService.hasFriend(user) {
+            return TripDAO.findTripsByUser(user);
+        }
+        return Collections.EMPTY_LIST;
+    }
 }
